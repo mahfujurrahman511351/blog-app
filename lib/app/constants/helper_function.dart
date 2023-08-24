@@ -38,6 +38,7 @@ void logout() {
   _storage.remove(USER_EMAIL);
   _storage.remove(USER_AVATAR);
   _secureStorage.delete(key: AUTH_TOKEN);
+  _storage.remove(USER_ID);
 
   Get.offAll(() => SignInView());
 }
@@ -79,4 +80,8 @@ getCustomDate(String date) {
   String newDate = '$newDay-$newMonth-$year';
 
   return newDate;
+}
+
+String get userId {
+  return _storage.read(USER_ID) ?? '';
 }

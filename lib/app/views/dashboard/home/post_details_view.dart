@@ -1,6 +1,8 @@
 import 'package:blog/app/constants/api_string.dart';
+import 'package:blog/app/views/dashboard/posts/edit_post_view/edit_post_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 import '../../../constants/helper_function.dart';
 import '../../../models/auth/user.dart';
@@ -15,12 +17,22 @@ class PostDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final category = post.category != null ? post.category as PostCategory : PostCategory();
+    final owner = post.user != null ? post.user as User : User();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Post Details"),
+        title: const Text("Post Details"),
         centerTitle: true,
         elevation: 0,
+        actions: [
+          if (owner.id == userId)
+            IconButton(
+              onPressed: () {
+                Get.to(() => const EditPostView());
+              },
+              icon: const Icon(Icons.edit_note),
+            )
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.w),
@@ -29,6 +41,7 @@ class PostDetailsView extends StatelessWidget {
           children: [
             _titleDescription(category),
             SizedBox(height: 10.w),
+            _thumbnail(),
             _images(),
             SizedBox(height: 10.w),
             _authorCard(),
@@ -61,7 +74,7 @@ class PostDetailsView extends StatelessWidget {
       padding: EdgeInsets.all(8.0.w),
       child: Column(
         children: [
-          Divider(),
+          const Divider(),
           Padding(
             padding: EdgeInsets.all(8.0.w),
             child: Row(
@@ -113,7 +126,6 @@ class PostDetailsView extends StatelessWidget {
 
   Widget _images() {
     final images = (post.images != null) || (post.images!.isNotEmpty) ? post.images as List<String> : <String>[];
-    images.insert(0, post.thumbnail ?? "");
 
     return Column(
       children: List.generate(images.length, (index) {
@@ -131,6 +143,22 @@ class PostDetailsView extends StatelessWidget {
               );
       }),
     );
+  }
+
+  Widget _thumbnail() {
+    final image = post.thumbnail != null ? post.thumbnail as String : '';
+    final imageUrl = imageBaseUrl + image;
+
+    return image.isEmpty
+        ? Container()
+        : Padding(
+            padding: EdgeInsets.symmetric(vertical: 5.0.w),
+            child: Image.network(
+              imageUrl,
+              width: double.infinity,
+              fit: BoxFit.contain,
+            ),
+          );
   }
 
   Widget _titleDescription(PostCategory category) {

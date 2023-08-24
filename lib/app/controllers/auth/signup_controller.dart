@@ -52,6 +52,7 @@ class SignupController extends GetxController {
           User user = response.data != null ? response.data as User : User();
           _storage.write(IS_LOGGED_IN, true);
           _storage.write(USER_NAME, user.name);
+          _storage.write(USER_ID, user.id);
           _storage.write(USER_EMAIL, user.email);
 
           await _secureStorage.write(key: AUTH_TOKEN, value: user.token);

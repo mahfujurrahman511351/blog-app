@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:blog/app/views/dashboard/posts/edit_post_view/edit_post_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -33,7 +34,7 @@ class PostCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _title(),
+              _title(context),
               SizedBox(height: 5.w),
               _name(),
               SizedBox(height: 5.w),
@@ -159,7 +160,7 @@ class PostCard extends StatelessWidget {
     );
   }
 
-  Widget _title() {
+  Widget _title(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -171,7 +172,43 @@ class PostCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        GestureDetector(child: Icon(Icons.more_vert))
+        PopupMenuButton(
+          onSelected: (value) {
+            switch (value) {
+              case 'save':
+                //save functionality
+                break;
+              case 'edit':
+                Get.to(() => EditPostView());
+                break;
+              case 'delete':
+                //delete functionality
+                break;
+              default:
+            }
+          },
+          itemBuilder: (context) {
+            User owner = post.user != null ? post.user as User : User();
+
+            return <PopupMenuItem>[
+              if (owner.id != userId)
+                PopupMenuItem(
+                  value: 'save',
+                  child: Text("Save", style: TextStyle(fontSize: 13.sp)),
+                ),
+              if (owner.id == userId)
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Text("Edit", style: TextStyle(fontSize: 13.sp)),
+                ),
+              if (owner.id == userId)
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Text("Delete", style: TextStyle(fontSize: 13.sp)),
+                ),
+            ];
+          },
+        ),
       ],
     );
   }

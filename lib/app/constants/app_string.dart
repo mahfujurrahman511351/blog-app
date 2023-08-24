@@ -4,6 +4,7 @@ const APP_NAME = "Tech Blog";
 const IS_LOGGED_IN = "isLoggedIn";
 const USER_LOGGED_IN = "userLoggedIn";
 const USER_NAME = "userName";
+const USER_ID = "userId";
 const USER_EMAIL = "userEmail";
 const USER_AVATAR = "userAvatar";
 const AUTH_TOKEN = "authToken";
