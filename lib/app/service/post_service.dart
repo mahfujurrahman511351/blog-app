@@ -116,4 +116,51 @@ class PostService {
 
     return apiResponse;
   }
+
+  Future<ApiResponse> editPost(Map<String, dynamic> content, List<String> images, List<String> deletedImages) async {
+    ApiResponse apiResponse = ApiResponse();
+
+    try {
+      final token = await getToken();
+      var headers = {"Authorization": "Bearer $token"};
+
+      var url = Uri.parse(editPostsApi);
+
+      var request = http.MultipartRequest("POST", url);
+
+      request.headers.addAll(headers);
+
+      for (var img in images) {
+        String ext = img.split('.').last;
+
+        var file = await http.MultipartFile.fromPath("images", img, contentType: MediaType('image', ext));
+
+        request.files.add(file);
+      }
+      request.fields["deletedThumbnail"] = content["deletedThumbnail"];
+      request.fields["deletedImages"] = jsonEncode(deletedImages);
+
+      request.fields["title"] = content["title"];
+      request.fields["description"] = content["description"];
+      request.fields["postId"] = content["postId"];
+      request.fields["categoryId"] = content["categoryId"];
+
+      final response = await request.send();
+
+      final responseData = await response.stream.toBytes();
+      final responseString = String.fromCharCodes(responseData);
+
+      final json = jsonDecode(responseString);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        apiResponse.data = ResponseStatus.fromJson(json);
+      } else {
+        apiResponse.error = handleError(response.statusCode, json);
+      }
+    } catch (e) {
+      apiResponse.error = SOMETHING_WENT_WRONG;
+    }
+
+    return apiResponse;
+  }
 }

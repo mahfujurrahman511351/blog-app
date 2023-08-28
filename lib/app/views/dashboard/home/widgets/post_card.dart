@@ -34,6 +34,7 @@ class PostCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 5.w),
               _title(context),
               SizedBox(height: 5.w),
               _name(),
@@ -179,7 +180,7 @@ class PostCard extends StatelessWidget {
                 //save functionality
                 break;
               case 'edit':
-                Get.to(() => EditPostView());
+                Get.to(() => EditPostView(post: post));
                 break;
               case 'delete':
                 //delete functionality

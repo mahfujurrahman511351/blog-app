@@ -8,6 +8,7 @@ import '../../models/dashboard/like.dart';
 import '../../models/dashboard/post.dart';
 import '../../models/response_status.dart';
 import '../../service/post_service.dart';
+import '../../views/dashboard/dashboard/dashboard_view.dart';
 
 class PostController extends GetxController {
   final _postService = PostService();
@@ -17,14 +18,87 @@ class PostController extends GetxController {
   var loadingData = false.obs;
   var likeUnlikeLoading = false.obs;
   var creatingPost = false.obs;
+  var updatingPost = false.obs;
+
+  var selectedCategory = "All Category".obs;
 
   String selectedCategoryId = "";
   String title = "";
   String description = "";
 
+  String editTitle = "";
+  String editDescription = "";
+  String editCategoryId = "";
+
+  var isNetworkImage = false.obs;
+  String deletedThumbnail = "";
+  var networkImages = <String>[].obs;
+  var deletedImages = <String>[];
+
   var thumbnailPath = "".obs;
   var imagePaths = <String>[].obs;
   //
+
+  editPost(String postId) async {
+    if (!updatingPost.value) {
+      updatingPost.value = true;
+
+      if (editCategoryId.isNotEmpty) {
+        if (thumbnailPath.isNotEmpty) {
+          //
+          final content = {
+            "title": editTitle,
+            "description": editDescription,
+            "postId": postId,
+            "categoryId": editCategoryId,
+            "deletedThumbnail": deletedThumbnail,
+          };
+          if (!isNetworkImage.value) {
+            imagePaths.insert(0, thumbnailPath.value);
+          }
+
+          final response = await _postService.editPost(content, imagePaths, deletedImages);
+
+          if (response.error == null) {
+            final responseStatus = response.data != null ? response.data as ResponseStatus : ResponseStatus();
+
+            bool success = responseStatus.success ?? false;
+
+            if (success) {
+              editTitle = "";
+              editDescription = "";
+              editCategoryId = "";
+              thumbnailPath.value = "";
+              deletedThumbnail = "";
+              imagePaths.clear();
+              deletedImages.clear();
+              getAllPosts();
+              Get.offAll(() => const DashboardView());
+              updatingPost.value = false;
+            } else {
+              updatingPost.value = false;
+              showError(error: responseStatus.message ?? "");
+            }
+            //
+          } else if (response.error == UN_AUTHENTICATED) {
+            updatingPost.value = false;
+            logout();
+            //
+          } else {
+            updatingPost.value = false;
+            showError(error: response.error ?? "Something went wrong");
+          }
+          //
+        } else {
+          updatingPost.value = false;
+          showError(title: "Thumbnail", error: "Select a thumbnail image first");
+        }
+      } else {
+        updatingPost.value = false;
+        showError(title: "Category", error: "Select a post category first");
+      }
+    }
+  }
 
   createPost() async {
     if (!creatingPost.value) {
@@ -77,7 +151,6 @@ class PostController extends GetxController {
           }
           //
         } else {
-          print("hrer");
           creatingPost.value = false;
           showError(title: "Thumbnail", error: "Select a thumbnail image first");
         }
@@ -88,11 +161,16 @@ class PostController extends GetxController {
     }
   }
 
-  selectThumbnail() async {
+  selectThumbnail({String? thumbnail}) async {
     var pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
+      if (isNetworkImage.value) {
+        deletedThumbnail = thumbnail ?? "";
+        isNetworkImage.value = false;
+      }
       thumbnailPath.value = pickedFile.path;
+
       //
     } else {
       Get.snackbar(

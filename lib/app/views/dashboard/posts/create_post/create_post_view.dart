@@ -48,7 +48,7 @@ class _CreatePostViewState extends State<CreatePostView> {
             key: _postKey,
             child: ListView(
               children: [
-                SizedBox(height: 20.w),
+                SizedBox(height: 5.w),
                 _category(),
                 SizedBox(height: 10.w),
                 _titleField(),
