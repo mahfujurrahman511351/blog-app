@@ -12,6 +12,37 @@ import '../models/drawer/api_response.dart';
 import '../models/response_status.dart';
 
 class PostService {
+  //
+  Future<ApiResponse> getDeletedPosts() async {
+    ApiResponse apiResponse = ApiResponse();
+
+    try {
+      var url = Uri.parse(deletedPostsApi);
+
+      String token = await getToken();
+
+      var headers = {"Accept": "application/json", 'Authorization': 'Bearer $token'};
+
+      var response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        var json = jsonDecode(response.body);
+
+        apiResponse.data = json.map((item) => Post.fromJson(item)).toList();
+
+        apiResponse.data as List<dynamic>;
+        //
+      } else {
+        var json = jsonDecode(response.body);
+        apiResponse.error = handleError(response.statusCode, json);
+      }
+    } catch (e) {
+      apiResponse.error = SOMETHING_WENT_WRONG;
+    }
+
+    return apiResponse;
+  }
+
   Future<ApiResponse> getAllPosts() async {
     ApiResponse apiResponse = ApiResponse();
 
@@ -153,6 +184,58 @@ class PostService {
       final json = jsonDecode(responseString);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        apiResponse.data = ResponseStatus.fromJson(json);
+      } else {
+        apiResponse.error = handleError(response.statusCode, json);
+      }
+    } catch (e) {
+      apiResponse.error = SOMETHING_WENT_WRONG;
+    }
+
+    return apiResponse;
+  }
+
+  Future<ApiResponse> deletePost(String postId) async {
+    ApiResponse apiResponse = ApiResponse();
+
+    try {
+      var url = Uri.parse(deletePostApi + postId);
+
+      String token = await getToken();
+
+      var headers = {"Accept": "application/json", "Authorization": "Bearer $token"};
+
+      var response = await http.delete(url, headers: headers);
+
+      var json = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        apiResponse.data = ResponseStatus.fromJson(json);
+      } else {
+        apiResponse.error = handleError(response.statusCode, json);
+      }
+    } catch (e) {
+      apiResponse.error = SOMETHING_WENT_WRONG;
+    }
+
+    return apiResponse;
+  }
+
+  Future<ApiResponse> deletePostPermanently(String postId) async {
+    ApiResponse apiResponse = ApiResponse();
+
+    try {
+      var url = Uri.parse(deletePostPermanentApi + postId);
+
+      String token = await getToken();
+
+      var headers = {"Accept": "application/json", "Authorization": "Bearer $token"};
+
+      var response = await http.delete(url, headers: headers);
+
+      var json = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
         apiResponse.data = ResponseStatus.fromJson(json);
       } else {
         apiResponse.error = handleError(response.statusCode, json);

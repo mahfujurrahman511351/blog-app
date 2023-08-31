@@ -1,6 +1,5 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:blog/app/views/dashboard/posts/edit_post_view/edit_post_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -12,13 +11,15 @@ import '../../../../controllers/dashboard/post_controller.dart';
 import '../../../../models/auth/user.dart';
 import '../../../../models/dashboard/post.dart';
 import '../../../../models/dashboard/post_category.dart';
+import '../../posts/edit_post_view/edit_post_view.dart';
 import '../post_details_view.dart';
 
 class PostCard extends StatelessWidget {
-  const PostCard({super.key, required this.post, required this.index});
+  const PostCard({super.key, required this.post, required this.index, required this.deletedPost});
 
   final Post post;
   final int index;
+  final bool deletedPost;
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +184,10 @@ class PostCard extends StatelessWidget {
                 Get.to(() => EditPostView(post: post));
                 break;
               case 'delete':
-                //delete functionality
+                Get.find<PostController>().deletePost(post.id ?? "", index);
+                break;
+              case 'delete_permanent':
+                Get.find<PostController>().deletePostPermanently(post.id ?? "", index);
                 break;
               default:
             }
@@ -197,15 +201,20 @@ class PostCard extends StatelessWidget {
                   value: 'save',
                   child: Text("Save", style: TextStyle(fontSize: 13.sp)),
                 ),
-              if (owner.id == userId)
+              if (owner.id == userId && !deletedPost)
                 PopupMenuItem(
                   value: 'edit',
                   child: Text("Edit", style: TextStyle(fontSize: 13.sp)),
                 ),
-              if (owner.id == userId)
+              if (owner.id == userId && !deletedPost)
                 PopupMenuItem(
                   value: 'delete',
                   child: Text("Delete", style: TextStyle(fontSize: 13.sp)),
+                ),
+              if (owner.id == userId && deletedPost)
+                PopupMenuItem(
+                  value: 'delete_permanent',
+                  child: Text("Delete permanently", style: TextStyle(fontSize: 13.sp)),
                 ),
             ];
           },

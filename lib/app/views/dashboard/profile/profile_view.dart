@@ -1,7 +1,9 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:blog/app/constants/helper_function.dart';
+import 'package:blog/app/views/dashboard/posts/deleted_post_view/deleted_post_view.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -9,9 +11,13 @@ class ProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
+      appBar: AppBar(
+        elevation: 0,
+        centerTitle: true,
+        title: Text("Profile Page"),
+      ),
       body: SafeArea(
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Center(
@@ -22,6 +28,12 @@ class ProfileView extends StatelessWidget {
                 logout();
               },
               child: Text("Log Out"),
+            ),
+            MaterialButton(
+              onPressed: () {
+                Get.to(() => DeletedPostView());
+              },
+              child: Text("Deleted Post"),
             )
           ],
         ),

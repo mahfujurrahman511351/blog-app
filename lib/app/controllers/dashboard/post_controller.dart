@@ -14,11 +14,14 @@ class PostController extends GetxController {
   final _postService = PostService();
   final _imagePicker = ImagePicker();
   var allPosts = <Post>[].obs;
+  var deletedPosts = <Post>[].obs;
 
   var loadingData = false.obs;
+  var gettingDeletedPost = false.obs;
   var likeUnlikeLoading = false.obs;
   var creatingPost = false.obs;
   var updatingPost = false.obs;
+  var deletingPost = false.obs;
 
   var selectedCategory = "All Category".obs;
 
@@ -209,6 +212,26 @@ class PostController extends GetxController {
     }
   }
 
+  getDeletedPosts() async {
+    gettingDeletedPost.value = true;
+    var response = await _postService.getDeletedPosts();
+
+    if (response.error == null) {
+      var postList = response.data != null ? response.data as List<dynamic> : [];
+
+      deletedPosts.clear();
+      for (var item in postList) {
+        deletedPosts.add(item);
+      }
+      gettingDeletedPost.value = false;
+    } else if (response.error == UN_AUTHENTICATED) {
+      logout();
+      gettingDeletedPost.value = false;
+    } else {
+      gettingDeletedPost.value = false;
+    }
+  }
+
   likeUnlike(String postId, int index) async {
     if (!likeUnlikeLoading.value) {
       likeUnlikeLoading.value = true;
@@ -243,9 +266,67 @@ class PostController extends GetxController {
     }
   }
 
+  deletePost(String postId, int index) async {
+    if (!deletingPost.value) {
+      deletingPost.value = true;
+
+      final response = await _postService.deletePost(postId);
+
+      if (response.error == null) {
+        final responseStatus = response.data != null ? response.data as ResponseStatus : ResponseStatus();
+
+        bool success = responseStatus.success ?? false;
+
+        if (success) {
+          allPosts.removeAt(index);
+          getDeletedPosts();
+          deletingPost.value = false;
+        } else {
+          deletingPost.value = false;
+          showError(error: responseStatus.message ?? "");
+        }
+      } else if (response.error == UN_AUTHENTICATED) {
+        logout();
+        deletingPost.value = false;
+      } else {
+        showError(error: response.error ?? "");
+        deletingPost.value = false;
+      }
+    }
+  }
+
+  deletePostPermanently(String postId, int index) async {
+    if (!deletingPost.value) {
+      deletingPost.value = true;
+
+      final response = await _postService.deletePostPermanently(postId);
+
+      if (response.error == null) {
+        final responseStatus = response.data != null ? response.data as ResponseStatus : ResponseStatus();
+
+        bool success = responseStatus.success ?? false;
+
+        if (success) {
+          deletedPosts.removeAt(index);
+          deletingPost.value = false;
+        } else {
+          deletingPost.value = false;
+          showError(error: responseStatus.message ?? "");
+        }
+      } else if (response.error == UN_AUTHENTICATED) {
+        logout();
+        deletingPost.value = false;
+      } else {
+        showError(error: response.error ?? "");
+        deletingPost.value = false;
+      }
+    }
+  }
+
   @override
   void onInit() {
     getAllPosts();
+    getDeletedPosts();
     super.onInit();
   }
 }
