@@ -19,3 +19,6 @@ const likeUnlikeApi = "$baseUrl/like-unlike/";
 const deletePostApi = "$baseUrl/delete-post/";
 const deletePostPermanentApi = "$baseUrl/delete-post-permanent/";
 const deletedPostsApi = "$baseUrl/deleted-posts";
+const getSavedPostsApi = "$baseUrl/get-saved-posts";
+const savedPostsApi = "$baseUrl/save-post/";
+const removeSavedPostsApi = "$baseUrl/remove-saved-post/";

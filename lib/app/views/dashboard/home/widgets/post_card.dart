@@ -15,11 +15,12 @@ import '../../posts/edit_post_view/edit_post_view.dart';
 import '../post_details_view.dart';
 
 class PostCard extends StatelessWidget {
-  const PostCard({super.key, required this.post, required this.index, required this.deletedPost});
+  const PostCard({super.key, required this.post, required this.index, required this.deletedPost, required this.savedPost});
 
   final Post post;
   final int index;
   final bool deletedPost;
+  final bool savedPost;
 
   @override
   Widget build(BuildContext context) {
@@ -177,8 +178,11 @@ class PostCard extends StatelessWidget {
         PopupMenuButton(
           onSelected: (value) {
             switch (value) {
+              case 'remove':
+                Get.find<PostController>().removeSavedPost(post.id ?? "", index);
+                break;
               case 'save':
-                //save functionality
+                Get.find<PostController>().savedPost(post.id ?? "");
                 break;
               case 'edit':
                 Get.to(() => EditPostView(post: post));
@@ -196,10 +200,15 @@ class PostCard extends StatelessWidget {
             User owner = post.user != null ? post.user as User : User();
 
             return <PopupMenuItem>[
-              if (owner.id != userId)
+              if (owner.id != userId && !savedPost)
                 PopupMenuItem(
                   value: 'save',
                   child: Text("Save", style: TextStyle(fontSize: 13.sp)),
+                ),
+              if (owner.id != userId && savedPost)
+                PopupMenuItem(
+                  value: 'remove',
+                  child: Text("Remove", style: TextStyle(fontSize: 13.sp)),
                 ),
               if (owner.id == userId && !deletedPost)
                 PopupMenuItem(

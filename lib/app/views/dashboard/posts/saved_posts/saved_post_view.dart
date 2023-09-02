@@ -8,8 +8,8 @@ import '../../../../controllers/dashboard/post_controller.dart';
 import '../../../../models/dashboard/post.dart';
 import '../../home/widgets/post_card.dart';
 
-class DeletedPostView extends StatelessWidget {
-  const DeletedPostView({super.key});
+class SavedPostsView extends StatelessWidget {
+  const SavedPostsView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,12 +17,12 @@ class DeletedPostView extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         centerTitle: true,
-        title: const Text("Deleted Posts"),
+        title: const Text("Saved Posts"),
       ),
       body: SafeArea(
         child: Obx(() {
-          var deletedPosts = Get.find<PostController>().deletedPosts;
-          bool loading = Get.find<PostController>().gettingDeletedPost.value;
+          var savedPosts = Get.find<PostController>().savedPosts;
+          bool loading = Get.find<PostController>().gettingSavedPost.value;
 
           return loading
               ? Center(
@@ -35,18 +35,18 @@ class DeletedPostView extends StatelessWidget {
                     strokeWidth: 6.w,
                   ),
                 ))
-              : deletedPosts.isEmpty
+              : savedPosts.isEmpty
                   ? Center(
-                      child: Text("No deleted post found yet!", style: TextStyle(fontSize: 14.sp)),
+                      child: Text("No saved post found yet!", style: TextStyle(fontSize: 14.sp)),
                     )
                   : ListView(
-                      children: List.generate(deletedPosts.length, (index) {
-                        Post post = deletedPosts[index];
+                      children: List.generate(savedPosts.length, (index) {
+                        Post post = savedPosts[index];
                         return PostCard(
                           post: post,
                           index: index,
-                          deletedPost: true,
-                          savedPost: false,
+                          deletedPost: false,
+                          savedPost: true,
                         );
                       }),
                     );

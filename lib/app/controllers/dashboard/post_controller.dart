@@ -15,13 +15,17 @@ class PostController extends GetxController {
   final _imagePicker = ImagePicker();
   var allPosts = <Post>[].obs;
   var deletedPosts = <Post>[].obs;
+  var savedPosts = <Post>[].obs;
 
   var loadingData = false.obs;
   var gettingDeletedPost = false.obs;
+  var gettingSavedPost = false.obs;
   var likeUnlikeLoading = false.obs;
   var creatingPost = false.obs;
   var updatingPost = false.obs;
   var deletingPost = false.obs;
+  var savingPost = false.obs;
+  var removingSavedPost = false.obs;
 
   var selectedCategory = "All Category".obs;
 
@@ -278,6 +282,13 @@ class PostController extends GetxController {
         bool success = responseStatus.success ?? false;
 
         if (success) {
+          Get.snackbar(
+            "Success",
+            "Post deleted successfully",
+            colorText: Colors.white,
+            backgroundColor: Colors.black87,
+            snackPosition: SnackPosition.BOTTOM,
+          );
           allPosts.removeAt(index);
           getDeletedPosts();
           deletingPost.value = false;
@@ -309,6 +320,13 @@ class PostController extends GetxController {
         if (success) {
           deletedPosts.removeAt(index);
           deletingPost.value = false;
+          Get.snackbar(
+            "Success",
+            "Post deleted permanently",
+            colorText: Colors.white,
+            backgroundColor: Colors.black87,
+            snackPosition: SnackPosition.BOTTOM,
+          );
         } else {
           deletingPost.value = false;
           showError(error: responseStatus.message ?? "");
@@ -323,10 +341,104 @@ class PostController extends GetxController {
     }
   }
 
+  removeSavedPost(String postId, int index) async {
+    if (!removingSavedPost.value) {
+      removingSavedPost.value = true;
+
+      final response = await _postService.removeSavedPosts(postId);
+
+      if (response.error == null) {
+        final responseStatus = response.data != null ? response.data as ResponseStatus : ResponseStatus();
+
+        bool success = responseStatus.success ?? false;
+
+        if (success) {
+          removingSavedPost.value = false;
+          savedPosts.removeAt(index);
+          Get.snackbar(
+            "Success",
+            "Post Removed successfully",
+            colorText: Colors.white,
+            backgroundColor: Colors.black87,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        } else {
+          removingSavedPost.value = false;
+          showError(error: responseStatus.message ?? "");
+        }
+      } else if (response.error == UN_AUTHENTICATED) {
+        logout();
+        removingSavedPost.value = false;
+      } else {
+        showError(error: response.error ?? "");
+        removingSavedPost.value = false;
+      }
+    }
+  }
+
+  savedPost(String postId) async {
+    if (!savingPost.value) {
+      savingPost.value = true;
+
+      final response = await _postService.savedPosts(postId);
+
+      if (response.error == null) {
+        final responseStatus = response.data != null ? response.data as ResponseStatus : ResponseStatus();
+
+        bool success = responseStatus.success ?? false;
+
+        if (success) {
+          getSavedPosts();
+          savingPost.value = false;
+          Get.snackbar(
+            "Success",
+            "Post Saved successfully",
+            colorText: Colors.white,
+            backgroundColor: Colors.black87,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        } else {
+          savingPost.value = false;
+          showError(error: responseStatus.message ?? "");
+        }
+      } else if (response.error == UN_AUTHENTICATED) {
+        logout();
+        savingPost.value = false;
+      } else {
+        showError(error: response.error ?? "");
+        savingPost.value = false;
+      }
+    }
+  }
+
+  getSavedPosts() async {
+    if (!gettingSavedPost.value) {
+      gettingSavedPost.value = true;
+
+      final response = await _postService.getSavedPosts();
+
+      if (response.error == null) {
+        var postList = response.data != null ? response.data as List<dynamic> : [];
+
+        savedPosts.clear();
+        for (var item in postList) {
+          savedPosts.add(item);
+        }
+        gettingSavedPost.value = false;
+      } else if (response.error == UN_AUTHENTICATED) {
+        logout();
+        gettingSavedPost.value = false;
+      } else {
+        gettingSavedPost.value = false;
+      }
+    }
+  }
+
   @override
   void onInit() {
     getAllPosts();
     getDeletedPosts();
+    getSavedPosts();
     super.onInit();
   }
 }
