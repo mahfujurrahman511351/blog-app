@@ -21,4 +21,5 @@ const deletePostPermanentApi = "$baseUrl/delete-post-permanent/";
 const deletedPostsApi = "$baseUrl/deleted-posts";
 const getSavedPostsApi = "$baseUrl/get-saved-posts";
 const savedPostsApi = "$baseUrl/save-post/";
+const restorePostsApi = "$baseUrl/restore-post/";
 const removeSavedPostsApi = "$baseUrl/remove-saved-post/";
