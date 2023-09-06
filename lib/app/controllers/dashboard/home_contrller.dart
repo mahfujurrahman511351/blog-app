@@ -8,6 +8,9 @@ import '../../constants/app_string.dart';
 class HomeController extends GetxController {
   final _homeService = HomeService();
   var categories = <PostCategory>[].obs;
+
+  var searching = false.obs;
+
   var selectedCategoryId = "";
 
   getCategories() async {

@@ -10,9 +10,10 @@ import '../../../models/dashboard/post.dart';
 import '../../../models/dashboard/post_category.dart';
 
 class PostDetailsView extends StatelessWidget {
-  const PostDetailsView({super.key, required this.post});
+  const PostDetailsView({super.key, required this.post, required this.deletedPost});
 
   final Post post;
+  final bool deletedPost;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class PostDetailsView extends StatelessWidget {
         centerTitle: true,
         elevation: 0,
         actions: [
-          if (owner.id == userId)
+          if (owner.id == userId && !deletedPost)
             IconButton(
               onPressed: () {
                 Get.to(() => EditPostView(post: post));
