@@ -25,3 +25,5 @@ const restorePostsApi = "$baseUrl/restore-post/";
 const removeSavedPostsApi = "$baseUrl/remove-saved-post/";
 const postByCategoryApi = "$baseUrl/get-posts-by-category/";
 const searchPostApi = "$baseUrl/search-posts/";
+//comments
+const getCommentApi = "$baseUrl/get-comments/";

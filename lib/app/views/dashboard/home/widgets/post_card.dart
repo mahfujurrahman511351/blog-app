@@ -15,7 +15,13 @@ import '../../posts/edit_post_view/edit_post_view.dart';
 import '../post_details_view.dart';
 
 class PostCard extends StatelessWidget {
-  const PostCard({super.key, required this.post, required this.index, required this.deletedPost, required this.savedPost});
+  const PostCard({
+    super.key,
+    required this.post,
+    required this.index,
+    required this.deletedPost,
+    required this.savedPost,
+  });
 
   final Post post;
   final int index;
@@ -78,7 +84,9 @@ class PostCard extends StatelessWidget {
         Text("|", style: TextStyle(fontSize: 20.sp)),
         Expanded(
           child: MaterialButton(
-            onPressed: () {},
+            onPressed: () {
+              Get.to(() => PostDetailsView(post: post, deletedPost: deletedPost));
+            },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

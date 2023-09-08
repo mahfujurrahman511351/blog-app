@@ -1,13 +1,18 @@
-import 'package:blog/app/constants/api_string.dart';
-import 'package:blog/app/views/dashboard/posts/edit_post_view/edit_post_view.dart';
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../../constants/api_string.dart';
 import '../../../constants/helper_function.dart';
+import '../../../controllers/dashboard/comment_controller.dart';
 import '../../../models/auth/user.dart';
+import '../../../models/dashboard/comment.dart';
 import '../../../models/dashboard/post.dart';
 import '../../../models/dashboard/post_category.dart';
+import '../posts/edit_post_view/edit_post_view.dart';
+import 'widgets/comment_card.dart';
 
 class PostDetailsView extends StatelessWidget {
   const PostDetailsView({super.key, required this.post, required this.deletedPost});
@@ -19,6 +24,7 @@ class PostDetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final category = post.category != null ? post.category as PostCategory : PostCategory();
     final owner = post.user != null ? post.user as User : User();
+    Get.find<CommentController>().getComments(post.id ?? "");
 
     return Scaffold(
       appBar: AppBar(
@@ -48,10 +54,24 @@ class PostDetailsView extends StatelessWidget {
             _authorCard(),
             _commentTitle(),
             SizedBox(height: 20.w),
+            _comments(),
+            SizedBox(height: 10.w),
           ],
         )),
       ),
     );
+  }
+
+  Widget _comments() {
+    return Obx(() {
+      final comments = Get.find<CommentController>().comments;
+      return Column(
+        children: List.generate(comments.length, (index) {
+          Comment comment = comments[index];
+          return CommentCard(comment: comment);
+        }),
+      );
+    });
   }
 
   Widget _commentTitle() {
@@ -95,27 +115,31 @@ class PostDetailsView extends StatelessWidget {
                     ),
                   ),
                 SizedBox(width: 10.w),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      user.name ?? '',
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w500,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user.name ?? '',
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    SizedBox(height: 5.w),
-                    Text(
-                      user.shortBio ?? '',
-                      style: TextStyle(fontSize: 13.sp),
-                    ),
-                    SizedBox(height: 5.w),
-                    Text(
-                      'Total ${user.postCount} posts',
-                      style: TextStyle(fontSize: 12.sp),
-                    ),
-                  ],
+                      SizedBox(height: 5.w),
+                      Text(
+                        user.shortBio ?? '',
+                        style: TextStyle(fontSize: 13.sp),
+                      ),
+                      SizedBox(height: 5.w),
+                      Text(
+                        'Total ${user.postCount} posts',
+                        style: TextStyle(fontSize: 12.sp),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
