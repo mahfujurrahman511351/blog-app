@@ -27,3 +27,5 @@ const postByCategoryApi = "$baseUrl/get-posts-by-category/";
 const searchPostApi = "$baseUrl/search-posts/";
 //comments
 const getCommentApi = "$baseUrl/get-comments/";
+const createCommentApi = "$baseUrl/create-comment";
+const deleteCommentApi = "$baseUrl/delete-comment/";
