@@ -20,11 +20,16 @@ class ProfileController extends GetxController {
   String currentPass = "";
   String newPass = "";
 
+  String name = "";
+  String phone = "";
+  String shortBio = "";
+
   var user = User().obs;
 
   var gettingData = false.obs;
   var showPasswordCard = false.obs;
   var changingPassword = false.obs;
+  var editingProfile = false.obs;
 
   getUser() async {
     if (!gettingData.value) {
@@ -87,6 +92,42 @@ class ProfileController extends GetxController {
       }
     }
     return changed;
+  }
+
+  updateProfile() async {
+    if (!editingProfile.value) {
+      editingProfile.value = true;
+
+      var body = jsonEncode({
+        "name": name,
+        "phone": phone,
+        "shortBio": shortBio,
+      });
+
+      final response = await _profileService.updateProfile(body: body);
+
+      if (response.error == null) {
+        final status = response.data != null ? response.data as ResponseStatus : ResponseStatus();
+
+        bool success = status.success ?? false;
+
+        if (success) {
+          getUser();
+
+          showCustomDialogue(title: "Success", message: status.message ?? "");
+          editingProfile.value = false;
+        } else {
+          editingProfile.value = false;
+          showError(error: status.message ?? "");
+        }
+      } else if (response.error == UN_AUTHENTICATED) {
+        logout();
+        editingProfile.value = false;
+      } else {
+        showError(error: response.error ?? '');
+        editingProfile.value = false;
+      }
+    }
   }
 
   @override

@@ -196,6 +196,7 @@ class PostController extends GetxController {
               thumbnailPath.value = "";
               imagePaths.clear();
               getAllPosts();
+              getMyPosts();
               Get.back();
               creatingPost.value = false;
             } else {

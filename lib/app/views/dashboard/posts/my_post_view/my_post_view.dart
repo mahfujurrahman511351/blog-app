@@ -46,7 +46,7 @@ class MyPostView extends StatelessWidget {
                           post: post,
                           index: index,
                           deletedPost: false,
-                          savedPost: true,
+                          savedPost: false,
                         );
                       }),
                     );

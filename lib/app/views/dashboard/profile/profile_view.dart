@@ -15,6 +15,7 @@ import '../../../controllers/dashboard/profile_Controller.dart';
 import '../posts/deleted_post_view/deleted_post_view.dart';
 import '../posts/my_post_view/my_post_view.dart';
 import '../posts/saved_posts/saved_post_view.dart';
+import 'edit_profile.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -259,7 +260,9 @@ class _ProfileViewState extends State<ProfileView> {
                       ),
                     ),
                     IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.to(() => EditProfileView(user: user));
+                        },
                         icon: Icon(
                           Icons.edit,
                           size: 18.sp,
