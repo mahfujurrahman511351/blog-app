@@ -32,13 +32,29 @@ void showError({required String error, String? title}) {
       ));
 }
 
-void logout() {
-  _storage.remove(IS_LOGGED_IN);
-  _storage.remove(USER_NAME);
-  _storage.remove(USER_EMAIL);
-  _storage.remove(USER_AVATAR);
-  _secureStorage.delete(key: AUTH_TOKEN);
-  _storage.remove(USER_ID);
+void showCustomDialogue({required String title, required String message}) {
+  Get.defaultDialog(
+      title: title,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(message),
+          SizedBox(height: 5.w),
+          MaterialButton(
+            onPressed: () => Get.back(),
+            child: const Text("OK"),
+          )
+        ],
+      ));
+}
+
+Future<void> logout() async {
+  await _storage.remove(IS_LOGGED_IN);
+  await _storage.remove(USER_NAME);
+  await _storage.remove(USER_EMAIL);
+  await _storage.remove(USER_AVATAR);
+  await _secureStorage.delete(key: AUTH_TOKEN);
+  await _storage.remove(USER_ID);
 
   Get.offAll(() => SignInView());
 }

@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unused_field
 
+import 'package:blog/app/constants/colors.dart';
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,6 +9,7 @@ import 'package:get/get.dart';
 import '../../../controllers/dashboard/comment_controller.dart';
 import '../../../controllers/dashboard/home_contrller.dart';
 import '../../../controllers/dashboard/post_controller.dart';
+import '../../../controllers/dashboard/profile_Controller.dart';
 import '../home/home_view.dart';
 import '../posts/create_post/create_post_view.dart';
 import '../profile/profile_view.dart';
@@ -23,6 +25,7 @@ class _DashboardViewState extends State<DashboardView> {
   final _homeController = Get.put(HomeController());
   final _postController = Get.put(PostController());
   final _commentController = Get.put(CommentController());
+  final _profileController = Get.put(ProfileController());
 
   int selectedIndex = 0;
 
@@ -42,10 +45,14 @@ class _DashboardViewState extends State<DashboardView> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: kBaseColor,
         onPressed: () {
           Get.to(() => const CreatePostView());
         },
-        child: Icon(Icons.add, size: 20.sp),
+        child: Icon(
+          Icons.add,
+          size: 20.sp,
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(

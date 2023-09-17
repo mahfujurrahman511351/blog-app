@@ -16,10 +16,12 @@ class PostController extends GetxController {
   var allPosts = <Post>[].obs;
   var deletedPosts = <Post>[].obs;
   var savedPosts = <Post>[].obs;
+  var myPosts = <Post>[].obs;
 
   var loadingData = false.obs;
   var gettingDeletedPost = false.obs;
   var gettingSavedPost = false.obs;
+  var gettingMyPost = false.obs;
   var likeUnlikeLoading = false.obs;
   var creatingPost = false.obs;
   var updatingPost = false.obs;
@@ -524,11 +526,35 @@ class PostController extends GetxController {
     }
   }
 
+  getMyPosts() async {
+    if (!gettingMyPost.value) {
+      gettingMyPost.value = true;
+
+      final response = await _postService.getMyPosts();
+
+      if (response.error == null) {
+        var myPostList = response.data != null ? response.data as List<dynamic> : [];
+
+        myPosts.clear();
+        for (var item in myPostList) {
+          myPosts.add(item);
+        }
+        gettingMyPost.value = false;
+      } else if (response.error == UN_AUTHENTICATED) {
+        logout();
+        gettingMyPost.value = false;
+      } else {
+        gettingMyPost.value = false;
+      }
+    }
+  }
+
   @override
   void onInit() {
     getAllPosts();
     getDeletedPosts();
     getSavedPosts();
+    getMyPosts();
     super.onInit();
   }
 }
