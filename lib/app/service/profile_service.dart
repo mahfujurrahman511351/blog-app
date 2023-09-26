@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'package:blog/app/constants/api_string.dart';
+import 'package:http_parser/http_parser.dart';
 
 import '../constants/app_string.dart';
 import '../constants/helper_function.dart';
@@ -27,7 +28,6 @@ class ProfileService {
 
         apiResponse.data = User.fromJson(json);
 
-        
         //
       } else {
         var json = jsonDecode(response.body);
@@ -64,6 +64,49 @@ class ProfileService {
       }
     } catch (e) {
       apiResponse.error = SERVER_ERROR;
+    }
+
+    return apiResponse;
+  }
+
+  Future<ApiResponse> updateProfilePhoto(String profileImage) async {
+    ApiResponse apiResponse = ApiResponse();
+
+    try {
+      final token = await getToken();
+      var headers = {"Authorization": "Bearer $token"};
+
+      var url = Uri.parse(updateProfilePhotoApi);
+
+      var request = http.MultipartRequest("POST", url);
+
+      request.headers.addAll(headers);
+
+      String ext = profileImage.split('.').last;
+
+      var file = await http.MultipartFile.fromPath("image", profileImage, contentType: MediaType('image', ext));
+
+      request.files.add(file);
+
+      final response = await request.send();
+
+      final responseData = await response.stream.toBytes();
+      final responseString = String.fromCharCodes(responseData);
+
+      final json = jsonDecode(responseString);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // apiResponse.data = ResponseStatus.fromJson(json);
+        final status = ResponseStatus.fromJson(json);
+
+        status.data = json["avatar"] ?? '';
+
+        apiResponse.data = status;
+      } else {
+        apiResponse.error = handleError(response.statusCode, json);
+      }
+    } catch (e) {
+      apiResponse.error = SOMETHING_WENT_WRONG;
     }
 
     return apiResponse;

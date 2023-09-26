@@ -43,7 +43,6 @@ class PostService {
     return apiResponse;
   }
 
-
   Future<ApiResponse> getSavedPosts() async {
     ApiResponse apiResponse = ApiResponse();
 
@@ -198,7 +197,14 @@ class PostService {
       final json = jsonDecode(responseString);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        apiResponse.data = ResponseStatus.fromJson(json);
+        // apiResponse.data = ResponseStatus.fromJson(json);
+        final status = ResponseStatus.fromJson(json);
+
+        print(json);
+
+        status.data = json["postCount"] ?? 0;
+
+        apiResponse.data = status;
       } else {
         apiResponse.error = handleError(response.statusCode, json);
       }

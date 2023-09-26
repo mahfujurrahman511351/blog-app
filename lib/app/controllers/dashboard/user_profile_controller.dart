@@ -2,20 +2,33 @@
 
 import 'dart:convert';
 
-import 'package:blog/app/models/response_status.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../constants/app_string.dart';
 import '../../constants/helper_function.dart';
 import '../../models/auth/user.dart';
+import '../../models/response_status.dart';
 import '../../service/auth_service.dart';
 import '../../service/profile_service.dart';
+import 'post_controller.dart';
 
-class ProfileController extends GetxController {
+class UserProfileController extends GetxController {
   final _storage = GetStorage();
   final _profileService = ProfileService();
   final _authService = AuthService();
+  final _imagePicker = ImagePicker();
+
+  var gettingData = false.obs;
+  var showPasswordCard = false.obs;
+  var changingPassword = false.obs;
+  var editingProfile = false.obs;
+  var updatingProfilePhoto = false.obs;
+
+  var profilePhotoPath = "".obs;
+  var avatar = "".obs;
 
   String currentPass = "";
   String newPass = "";
@@ -25,11 +38,6 @@ class ProfileController extends GetxController {
   String shortBio = "";
 
   var user = User().obs;
-
-  var gettingData = false.obs;
-  var showPasswordCard = false.obs;
-  var changingPassword = false.obs;
-  var editingProfile = false.obs;
 
   getUser() async {
     if (!gettingData.value) {
@@ -46,6 +54,8 @@ class ProfileController extends GetxController {
         await _storage.write(USER_AVATAR, userResponse.avatar);
 
         user.value = userResponse;
+        avatar.value = userResponse.avatar ?? "";
+
         gettingData.value = false;
       } else if (response.error == UN_AUTHENTICATED) {
         logout();
@@ -126,6 +136,69 @@ class ProfileController extends GetxController {
       } else {
         showError(error: response.error ?? '');
         editingProfile.value = false;
+      }
+    }
+  }
+
+  selectProfilePhoto({required ImageSource source}) async {
+    var pickedFile = await _imagePicker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      profilePhotoPath.value = pickedFile.path;
+
+      if (pickedFile.path.isNotEmpty) {
+        updateProfilePhoto(pickedFile.path);
+      } else {
+        Get.snackbar(
+          "Failed",
+          "Image upload failed",
+          colorText: Colors.white,
+          backgroundColor: Colors.black54,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } else {
+      Get.snackbar(
+        "Not Selected",
+        "No Image selected",
+        colorText: Colors.white,
+        backgroundColor: Colors.black54,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  updateProfilePhoto(String imagePath) async {
+    if (!updatingProfilePhoto.value) {
+      updatingProfilePhoto.value = true;
+
+      final response = await _profileService.updateProfilePhoto(imagePath);
+
+      if (response.error == null) {
+        final status = response.data != null ? response.data as ResponseStatus : ResponseStatus();
+
+        bool success = status.success ?? false;
+
+        if (success) {
+          String avatarImage = status.data != null ? status.data as String : "";
+
+          avatar.value = avatarImage;
+
+          updatingProfilePhoto.value = false;
+
+          Get.find<PostController>().getData();
+
+          showCustomDialogue(title: "Success", message: status.message ?? "");
+        } else {
+          showError(error: status.message ?? "");
+          updatingProfilePhoto.value = false;
+        }
+      } else if (response.error == UN_AUTHENTICATED) {
+        logout();
+        updatingProfilePhoto.value = false;
+      } else {
+        showError(error: response.error ?? "");
+        updatingProfilePhoto.value = false;
       }
     }
   }

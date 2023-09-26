@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import '../../../controllers/dashboard/comment_controller.dart';
 import '../../../controllers/dashboard/home_contrller.dart';
 import '../../../controllers/dashboard/post_controller.dart';
-import '../../../controllers/dashboard/profile_Controller.dart';
+import '../../../controllers/dashboard/user_profile_controller.dart';
 import '../home/home_view.dart';
 import '../posts/create_post/create_post_view.dart';
 import '../profile/profile_view.dart';
@@ -25,7 +25,7 @@ class _DashboardViewState extends State<DashboardView> {
   final _homeController = Get.put(HomeController());
   final _postController = Get.put(PostController());
   final _commentController = Get.put(CommentController());
-  final _profileController = Get.put(ProfileController());
+  final _profileController = Get.put(UserProfileController());
 
   int selectedIndex = 0;
 

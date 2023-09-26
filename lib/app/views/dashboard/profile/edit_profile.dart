@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 
 import '../../../constants/colors.dart';
-import '../../../controllers/dashboard/profile_Controller.dart';
+import '../../../controllers/dashboard/user_profile_controller.dart';
 import '../../../models/auth/user.dart';
 
 class EditProfileView extends StatefulWidget {
@@ -24,7 +24,7 @@ class _EditProfileViewState extends State<EditProfileView> {
 
   final _profileEditingKey = GlobalKey<FormState>();
 
-  final controller = Get.find<ProfileController>();
+  final controller = Get.find<UserProfileController>();
 
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -105,7 +105,7 @@ class _EditProfileViewState extends State<EditProfileView> {
       ),
       controller: _nameController,
       onSaved: (value) {
-        Get.find<ProfileController>().name = value ?? "";
+        Get.find<UserProfileController>().name = value ?? "";
       },
       validator: MultiValidator([
         RequiredValidator(errorText: "Full Name is required"),
@@ -132,7 +132,7 @@ class _EditProfileViewState extends State<EditProfileView> {
       ),
       controller: _phoneController,
       onSaved: (value) {
-        Get.find<ProfileController>().phone = value ?? "";
+        Get.find<UserProfileController>().phone = value ?? "";
       },
       validator: MultiValidator([
         RequiredValidator(errorText: "Number is required"),
@@ -159,7 +159,7 @@ class _EditProfileViewState extends State<EditProfileView> {
       ),
       controller: _shortBioController,
       onSaved: (value) {
-        Get.find<ProfileController>().shortBio = value ?? "";
+        Get.find<UserProfileController>().shortBio = value ?? "";
       },
       validator: MultiValidator([
         RequiredValidator(errorText: "Bio is required"),
@@ -173,13 +173,13 @@ class _EditProfileViewState extends State<EditProfileView> {
       onPressed: () async {
         if (_profileEditingKey.currentState!.validate()) {
           _profileEditingKey.currentState!.save();
-          Get.find<ProfileController>().updateProfile();
+          Get.find<UserProfileController>().updateProfile();
         }
       },
       minWidth: double.infinity,
       color: kBaseColor,
       child: Obx(() {
-        final controller = Get.find<ProfileController>();
+        final controller = Get.find<UserProfileController>();
         return controller.editingProfile.value
             ? SizedBox(
                 height: 30.w,

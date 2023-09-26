@@ -81,28 +81,29 @@ class _SignUpViewState extends State<SignUpView> {
   Widget _nextButton() {
     final controller = Get.find<SignupController>();
     return MaterialButton(
-        color: kBaseColor,
-        onPressed: () {
-          if (_signUpKey.currentState!.validate()) {
-            controller.handleSendOtp();
-          }
-        },
-        child: Obx(() {
-          return controller.checkingSendOtp.value
-              ? SizedBox(
-                  height: 30.w,
-                  width: 30.w,
-                  child: LoadingIndicator(
-                    indicatorType: Indicator.ballSpinFadeLoader,
-                    colors: const [Color(0xFFffffff)],
-                    strokeWidth: 6.w,
-                  ),
-                )
-              : Text(
-                  "Next",
-                  style: TextStyle(fontSize: 15.w, color: Colors.white),
-                );
-        }));
+      color: kBaseColor,
+      onPressed: () {
+        if (_signUpKey.currentState!.validate()) {
+          controller.handleSendOtp();
+        }
+      },
+      child: Obx(() {
+        return controller.checkingSendOtp.value
+            ? SizedBox(
+                height: 30.w,
+                width: 30.w,
+                child: LoadingIndicator(
+                  indicatorType: Indicator.ballSpinFadeLoader,
+                  colors: const [Color(0xFFffffff)],
+                  strokeWidth: 6.w,
+                ),
+              )
+            : Text(
+                "Next",
+                style: TextStyle(fontSize: 15.w, color: Colors.white),
+              );
+      }),
+    );
   }
 
   Widget _passwordField() {

@@ -5,13 +5,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 
 import '../../../constants/api_string.dart';
 import '../../../constants/app_string.dart';
 import '../../../constants/colors.dart';
 import '../../../constants/helper_function.dart';
-import '../../../controllers/dashboard/profile_Controller.dart';
+import '../../../controllers/dashboard/user_profile_controller.dart';
 import '../posts/deleted_post_view/deleted_post_view.dart';
 import '../posts/my_post_view/my_post_view.dart';
 import '../posts/saved_posts/saved_post_view.dart';
@@ -116,7 +117,7 @@ class _ProfileViewState extends State<ProfileView> {
   Widget _changePassword() {
     return GestureDetector(
       onTap: () {
-        final controller = Get.find<ProfileController>();
+        final controller = Get.find<UserProfileController>();
         controller.showPasswordCard.value = !controller.showPasswordCard.value;
       },
       child: Card(
@@ -143,13 +144,13 @@ class _ProfileViewState extends State<ProfileView> {
                     ),
                   ),
                   Obx(() {
-                    bool showPasswordCard = Get.find<ProfileController>().showPasswordCard.value;
+                    bool showPasswordCard = Get.find<UserProfileController>().showPasswordCard.value;
                     return showPasswordCard ? Icon(Icons.arrow_drop_down) : Icon(Icons.arrow_right);
                   })
                 ],
               ),
               Obx(() {
-                bool showPasswordCard = Get.find<ProfileController>().showPasswordCard.value;
+                bool showPasswordCard = Get.find<UserProfileController>().showPasswordCard.value;
                 return showPasswordCard
                     ? Padding(
                         padding: EdgeInsets.symmetric(horizontal: 8.0),
@@ -169,7 +170,7 @@ class _ProfileViewState extends State<ProfileView> {
                                 ]),
                                 controller: _currentPasswordController,
                                 onSaved: (value) {
-                                  Get.find<ProfileController>().currentPass = value ?? "";
+                                  Get.find<UserProfileController>().currentPass = value ?? "";
                                 },
                               ),
                               SizedBox(height: 5.w),
@@ -184,7 +185,7 @@ class _ProfileViewState extends State<ProfileView> {
                                 ]),
                                 controller: _newPasswordController,
                                 onSaved: (value) {
-                                  Get.find<ProfileController>().newPass = value ?? "";
+                                  Get.find<UserProfileController>().newPass = value ?? "";
                                 },
                               ),
                               SizedBox(height: 5.w),
@@ -192,7 +193,7 @@ class _ProfileViewState extends State<ProfileView> {
                                 onPressed: () async {
                                   if (_passwordKey.currentState!.validate()) {
                                     _passwordKey.currentState!.save();
-                                    bool changed = await Get.find<ProfileController>().updatePassword();
+                                    bool changed = await Get.find<UserProfileController>().updatePassword();
 
                                     if (changed) {
                                       _currentPasswordController.clear();
@@ -203,7 +204,7 @@ class _ProfileViewState extends State<ProfileView> {
                                 minWidth: double.infinity,
                                 color: kBaseColor,
                                 child: Obx(() {
-                                  final controller = Get.find<ProfileController>();
+                                  final controller = Get.find<UserProfileController>();
                                   return controller.changingPassword.value
                                       ? SizedBox(
                                           height: 30.w,
@@ -235,7 +236,7 @@ class _ProfileViewState extends State<ProfileView> {
 
   Widget _infoCard() {
     return Obx(() {
-      final user = Get.find<ProfileController>().user.value;
+      final user = Get.find<UserProfileController>().user.value;
       return Card(
         elevation: 3,
         child: Padding(
@@ -269,7 +270,7 @@ class _ProfileViewState extends State<ProfileView> {
                         )),
                   ],
                 ),
-                SizedBox(height: 3.w),
+                SizedBox(height: 5.w),
                 Text(
                   "Email : ${user.email ?? "N/A"}",
                   style: TextStyle(
@@ -277,7 +278,7 @@ class _ProfileViewState extends State<ProfileView> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                SizedBox(height: 3.w),
+                SizedBox(height: 5.w),
                 Text(
                   "Phone : ${user.phone ?? "N/A"}",
                   style: TextStyle(
@@ -285,7 +286,7 @@ class _ProfileViewState extends State<ProfileView> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                SizedBox(height: 3.w),
+                SizedBox(height: 5.w),
                 Text(
                   "Total Posts : ${user.postCount ?? "N/A"}",
                   style: TextStyle(
@@ -293,7 +294,7 @@ class _ProfileViewState extends State<ProfileView> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                SizedBox(height: 3.w),
+                SizedBox(height: 5.w),
                 Text(
                   "Joining Date : ${getCustomDate(user.createdAt ?? "") ?? "N/A"}",
                   style: TextStyle(
@@ -301,7 +302,7 @@ class _ProfileViewState extends State<ProfileView> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                SizedBox(height: 3.w),
+                SizedBox(height: 5.w),
                 Text(
                   "ShortBio : ${user.shortBio ?? "N/A"}",
                   style: TextStyle(
@@ -321,25 +322,93 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Widget _profileImage() {
-    return Obx(() {
-      var user = Get.find<ProfileController>().user.value;
-      String avatar = user.avatar ?? "";
+    return GestureDetector(
+      onTap: () {
+        _selectProfilePhotoOption();
+      },
+      child: Obx(() {
+        var avatar = Get.find<UserProfileController>().avatar.value;
 
-      String avatarUrl = imageBaseUrl + avatar;
-
-      return Container(
-        width: 80.w,
-        height: 80.w,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.transparent,
-          border: Border.all(width: 1.w, color: Colors.grey[400]!),
-          image: DecorationImage(
-            image: avatar.isNotEmpty ? NetworkImage(avatarUrl) : AssetImage(DEFAULT_USER_IMAGE) as ImageProvider<Object>,
+        String avatarUrl = imageBaseUrl + avatar;
+        return Container(
+          width: 80.w,
+          height: 80.w,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.transparent,
+            border: Border.all(width: 1.w, color: Colors.grey[400]!),
+            image: DecorationImage(
+              image: avatar.isNotEmpty ? NetworkImage(avatarUrl) : AssetImage(DEFAULT_USER_IMAGE) as ImageProvider<Object>,
+            ),
           ),
-        ),
-      );
-    });
+          child: Center(
+            child: Obx(() {
+              final controller = Get.find<UserProfileController>();
+              return controller.updatingProfilePhoto.value
+                  ? SizedBox(
+                      height: 30.w,
+                      width: 30.w,
+                      child: LoadingIndicator(
+                        indicatorType: Indicator.ballSpinFadeLoader,
+                        colors: const [kBaseColor],
+                        strokeWidth: 6.w,
+                      ),
+                    )
+                  : Container();
+            }),
+          ),
+        );
+      }),
+    );
+  }
+
+  void _selectProfilePhotoOption() {
+    Get.defaultDialog(
+        title: "Select Option",
+        content: GestureDetector(
+          onTap: () {
+            Get.find<UserProfileController>().selectProfilePhoto(source: ImageSource.camera);
+            Get.back();
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: 50.0.w),
+                child: Row(
+                  children: [
+                    const Icon(Icons.camera_alt),
+                    SizedBox(width: 5.w),
+                    Text(
+                      "Camera",
+                      style: TextStyle(fontSize: 15.sp),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(height: 10.w),
+              GestureDetector(
+                onTap: () {
+                  Get.find<UserProfileController>().selectProfilePhoto(source: ImageSource.gallery);
+                  Get.back();
+                },
+                child: Padding(
+                  padding: EdgeInsets.only(left: 50.0.w),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.image),
+                      SizedBox(width: 5.w),
+                      Text(
+                        "Gallery",
+                        style: TextStyle(fontSize: 15.sp),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ));
   }
 }
 

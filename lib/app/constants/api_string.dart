@@ -7,6 +7,7 @@ const imageBaseUrl = "http://10.0.2.2:3000/"; // bluestack
 //profile
 const profileApi = baseUrl;
 const updateProfileApi = "$baseUrl/update-profile";
+const updateProfilePhotoApi = "$baseUrl/update-profile-photo";
 //authentication
 const loginApi = "$baseUrl/login";
 const registerApi = "$baseUrl/register";
